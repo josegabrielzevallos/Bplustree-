@@ -9,10 +9,10 @@
 
 std::size_t NUMBER_THREADS = 8;
 
-const std::size_t NUMBER_OPERATIONS = 100000;
+const std::size_t NUMBER_OPERATIONS = 10;
 
 int MIN_VALUE = 1;
-int MAX_VALUE = 15000;
+int MAX_VALUE = 10;
 
 std::random_device rd;
 
