@@ -78,8 +78,8 @@ public:
   void insert(const data_type& value) {
       if (empty()) {
           root = new Nodo;
-          root->key[0] = value;
-          root->hoja = true;
+          root->key[0] = value;//inicilaizamos el rooty la hoja
+          root->hoja = true;// es un ahoja
           root->Tam = 1;
       } else {
 
@@ -89,27 +89,27 @@ public:
 
           if (apuntador->Tam < B) {
               int i = 0;
-              while (value > apuntador->key[i] && i < apuntador->Tam)
-                  i++;
-              for (int j = apuntador->Tam; j > i; j--) {
-                  apuntador->key[j] = apuntador->key[j - 1];
-              }
+              mayormenor(value,apuntador,i);
+              //int i = 0;
+
               apuntador->key[i] = value;
               apuntador->Tam++;
               apuntador->ptr[apuntador->Tam] = apuntador->ptr[apuntador->Tam - 1];
               apuntador->ptr[apuntador->Tam - 1] = NULL;
           } else {
-              Nodo *nuevahoja = new Nodo;
+              Nodo *nuevahoja = new Nodo;// se crea un anueva hoja
               int tempNodo[B + 1];
               for (int i = 0; i < B; i++) {
                   tempNodo[i] = apuntador->key[i];
               }
               int i = 0, j;
+
               while (value > tempNodo[i] && i < B)
                   i++;
               for (int j = B + 1; j > i; j--) {
                   tempNodo[j] = tempNodo[j - 1];
               }
+
               tempNodo[i] = value;
               nuevahoja->hoja = true;
               apuntador->Tam = (B + 1) / 2;
@@ -117,6 +117,7 @@ public:
               apuntador->ptr[apuntador->Tam] = nuevahoja;
               nuevahoja->ptr[nuevahoja->Tam] = apuntador->ptr[B];
               apuntador->ptr[B] = NULL;
+
               for (i = 0; i < apuntador->Tam; i++) {
                   apuntador->key[i] = tempNodo[i];
               }
@@ -145,6 +146,18 @@ public:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  void mayormenor(const data_type& value,Nodo*& apuntador,int& indice){
+      //int i = 0;
+      //while (value > apuntador->key[i]){
+      while (value > apuntador->key[indice] && indice < apuntador->Tam)//si el valor es mayor
+          indice++;
+      for (int j = apuntador->Tam; j > indice; j--) {// si es menor
+          apuntador->key[j] = apuntador->key[j - 1];
+      }
+  }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   void actual(const data_type& value,Nodo*& apuntador,Nodo*& padre){
       while (apuntador->hoja == false) {
           padre = apuntador;
@@ -163,18 +176,16 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  void Insertardentro(int x, Nodo *apuntador, Nodo *hijo) {
+  void Insertardentro(const data_type& value, Nodo *apuntador, Nodo *hijo) {
       if (apuntador->Tam < B) {
           int i = 0;
-          while (x > apuntador->key[i] && i < apuntador->Tam)
-              i++;
-          for (int j = apuntador->Tam; j > i; j--) {
-              apuntador->key[j] = apuntador->key[j - 1];
-          }
+
+          mayormenor(value,apuntador,i);
+
           for (int j = apuntador->Tam + 1; j > i + 1; j--) {
               apuntador->ptr[j] = apuntador->ptr[j - 1];
           }
-          apuntador->key[i] = x;
+          apuntador->key[i] = value;
           apuntador->Tam++;
           apuntador->ptr[i + 1] = hijo;
       } else {
@@ -188,12 +199,12 @@ public:
               virtualPtr[i] = apuntador->ptr[i];
           }
           int i = 0, j;
-          while (x > TempKey[i] && i < B)
+          while (value > TempKey[i] && i < B)
               i++;
           for (int j = B + 1; j > i; j--) {
               TempKey[j] = TempKey[j - 1];
           }
-          TempKey[i] = x;
+          TempKey[i] = value;
           for (int j = B + 2; j > i + 1; j--) {
               virtualPtr[j] = virtualPtr[j - 1];
           }
