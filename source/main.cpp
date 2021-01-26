@@ -24,8 +24,8 @@ class TreeSearcher {
   void operator()() {
     std::uniform_int_distribution<int> distribution(MIN_VALUE, MAX_VALUE);
     for (std::size_t i = 0; i < NUMBER_OPERATIONS; ++i) {
-      std::cout << distribution(rd) << "\n";
-      // b_link_->search(distribution(rd));
+      std::cout << distribution(rd) << "\n";//comentar
+       b_link_->search(distribution(rd));
     }
   }
 
@@ -37,8 +37,8 @@ class TreeSearcher {
 void sequential_insert(EDA::Concurrent::BLinkTree<3, int> *b_link) {
   std::uniform_int_distribution<int> distribution(MIN_VALUE, MAX_VALUE);
   for (std::size_t i = 0; i < NUMBER_OPERATIONS; ++i) {
-    std::cout << distribution(rd) << "\n";
-    // b_link->insert(distribution(rd));
+    std::cout << distribution(rd) << "\n";//comentar
+    b_link->insert(distribution(rd));
   }
 }
 
@@ -55,6 +55,16 @@ void run_test() {
   for (std::size_t i = 0; i < NUMBER_THREADS; ++i) {
     threads[i].join();
   }
+    /*b_link.insert(5);
+    b_link.insert(6);
+    b_link.insert(69);
+    b_link.insert(9);
+    b_link.insert(11);
+    b_link.insert(19);
+    b_link.insert(1);
+    b_link.insert(4986513);
+    b_link.insert(65);
+    b_link.search(16);*/
 }
 
 int main() {

@@ -7,6 +7,14 @@
 #IncludeRegexTransform: 
 
 C:/Users/Jose Gabriel/Documents/C.Computacion/2021-R/EDA/Parcial/b-link/source/b-link.hpp
+climits
+-
+fstream
+-
+iostream
+-
+sstream
+-
 utility
 -
 
