@@ -18,7 +18,7 @@ template <std::size_t B, typename Type>
 class BLinkTree {
     struct Nodo{
         bool hoja;
-        int *key,size;
+        int *key,Tam;
         Nodo **ptr;
 
         Nodo(){
@@ -27,7 +27,11 @@ class BLinkTree {
         }
     };
     Nodo *root;
- public:
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+public:
   typedef Type data_type;
 
   BLinkTree() {root=nullptr;}
@@ -35,6 +39,8 @@ class BLinkTree {
   ~BLinkTree() {}
 
   std::size_t size() const {}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   bool empty() const {
       if(root==NULL) {
@@ -44,27 +50,20 @@ class BLinkTree {
       }
   }
 
-  bool search(const data_type& value) const {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  bool search(const data_type& value)  {
       if(empty()) {
           cout << "El arbol esta vacio" << endl;
           return 0;
       }
       else{
-          Nodo *cursor=root;
-          while(cursor->hoja==false){
-              for(int i=0;i<cursor->size;i++){
-                  if(value<cursor->key[i]){
-                      cursor=cursor->ptr[i];
-                      break;
-                  }
-                  if(i==cursor->size-1){
-                      cursor=cursor->ptr[i+1];
-                      break;
-                  }
-              }
-          }
-          for(int i=0;i<cursor->size;i++){
-              if(cursor->key[i]==value){
+          Nodo *apuntador=root;
+          Nodo *padre;
+          actual(value,apuntador,padre);
+
+          for(int i=0;i<apuntador->Tam;i++){
+              if(apuntador->key[i]==value){
                   cout<<"Encontrado"<<endl;
                   return 1;
               }
@@ -74,162 +73,183 @@ class BLinkTree {
       }
   }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   void insert(const data_type& value) {
       if (empty()) {
           root = new Nodo;
           root->key[0] = value;
           root->hoja = true;
-          root->size = 1;
+          root->Tam = 1;
       } else {
-          Nodo *cursor = root;
-          Nodo *parent;
-          while (cursor->hoja == false) {
-              parent = cursor;
-              for (int i = 0; i < cursor->size; i++) {
-                  if (value < cursor->key[i]) {
-                      cursor = cursor->ptr[i];
-                      break;
-                  }
-                  if (i == cursor->size - 1) {
-                      cursor = cursor->ptr[i + 1];
-                      break;
-                  }
-              }
-          }
-          if (cursor->size < B) {
+
+          Nodo *apuntador = root;
+          Nodo *padre;
+          actual(value,apuntador,padre);
+
+          if (apuntador->Tam < B) {
               int i = 0;
-              while (value > cursor->key[i] && i < cursor->size)
+              while (value > apuntador->key[i] && i < apuntador->Tam)
                   i++;
-              for (int j = cursor->size; j > i; j--) {
-                  cursor->key[j] = cursor->key[j - 1];
+              for (int j = apuntador->Tam; j > i; j--) {
+                  apuntador->key[j] = apuntador->key[j - 1];
               }
-              cursor->key[i] = value;
-              cursor->size++;
-              cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
-              cursor->ptr[cursor->size - 1] = NULL;
+              apuntador->key[i] = value;
+              apuntador->Tam++;
+              apuntador->ptr[apuntador->Tam] = apuntador->ptr[apuntador->Tam - 1];
+              apuntador->ptr[apuntador->Tam - 1] = NULL;
           } else {
-              Nodo *newLeaf = new Nodo;
-              int virtualNode[B + 1];
+              Nodo *nuevahoja = new Nodo;
+              int tempNodo[B + 1];
               for (int i = 0; i < B; i++) {
-                  virtualNode[i] = cursor->key[i];
+                  tempNodo[i] = apuntador->key[i];
               }
               int i = 0, j;
-              while (value > virtualNode[i] && i < B)
+              while (value > tempNodo[i] && i < B)
                   i++;
               for (int j = B + 1; j > i; j--) {
-                  virtualNode[j] = virtualNode[j - 1];
+                  tempNodo[j] = tempNodo[j - 1];
               }
-              virtualNode[i] = value;
-              newLeaf->hoja = true;
-              cursor->size = (B + 1) / 2;
-              newLeaf->size = B + 1 - (B + 1) / 2;
-              cursor->ptr[cursor->size] = newLeaf;
-              newLeaf->ptr[newLeaf->size] = cursor->ptr[B];
-              cursor->ptr[B] = NULL;
-              for (i = 0; i < cursor->size; i++) {
-                  cursor->key[i] = virtualNode[i];
+              tempNodo[i] = value;
+              nuevahoja->hoja = true;
+              apuntador->Tam = (B + 1) / 2;
+              nuevahoja->Tam = B + 1 - (B + 1) / 2;
+              apuntador->ptr[apuntador->Tam] = nuevahoja;
+              nuevahoja->ptr[nuevahoja->Tam] = apuntador->ptr[B];
+              apuntador->ptr[B] = NULL;
+              for (i = 0; i < apuntador->Tam; i++) {
+                  apuntador->key[i] = tempNodo[i];
               }
-              for (i = 0, j = cursor->size; i < newLeaf->size; i++, j++) {
-                  newLeaf->key[i] = virtualNode[j];
+              for (i = 0, j = apuntador->Tam; i < nuevahoja->Tam; i++, j++) {
+                  nuevahoja->key[i] = tempNodo[j];
               }
-              if (cursor == root) {
+              if (apuntador == root) {
                   Nodo *newRoot = new Nodo;
-                  newRoot->key[0] = newLeaf->key[0];
-                  newRoot->ptr[0] = cursor;
-                  newRoot->ptr[1] = newLeaf;
+                  newRoot->key[0] = nuevahoja->key[0];
+                  newRoot->ptr[0] = apuntador;
+                  newRoot->ptr[1] = nuevahoja;
                   newRoot->hoja = false;
-                  newRoot->size = 1;
+                  newRoot->Tam = 1;
                   root = newRoot;
               } else {
-                  insertInternal(newLeaf->key[0], parent, newLeaf);
+                  Insertardentro(nuevahoja->key[0], padre, nuevahoja);
               }
           }
       }
   }
-  void posactual(){
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  void remove(const data_type& value) {}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  void actual(const data_type& value,Nodo*& apuntador,Nodo*& padre){
+      while (apuntador->hoja == false) {
+          padre = apuntador;
+          for (int i = 0; i < apuntador->Tam; i++) {
+              if (value < apuntador->key[i]) {
+                  apuntador = apuntador->ptr[i];
+                  break;
+              }
+              if (i == apuntador->Tam - 1) {
+                  apuntador = apuntador->ptr[i + 1];
+                  break;
+              }
+          }
+      }
   }
 
-  void insertInternal(int x, Nodo *cursor, Nodo *child) {
-      if (cursor->size < B) {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  void Insertardentro(int x, Nodo *apuntador, Nodo *hijo) {
+      if (apuntador->Tam < B) {
           int i = 0;
-          while (x > cursor->key[i] && i < cursor->size)
+          while (x > apuntador->key[i] && i < apuntador->Tam)
               i++;
-          for (int j = cursor->size; j > i; j--) {
-              cursor->key[j] = cursor->key[j - 1];
+          for (int j = apuntador->Tam; j > i; j--) {
+              apuntador->key[j] = apuntador->key[j - 1];
           }
-          for (int j = cursor->size + 1; j > i + 1; j--) {
-              cursor->ptr[j] = cursor->ptr[j - 1];
+          for (int j = apuntador->Tam + 1; j > i + 1; j--) {
+              apuntador->ptr[j] = apuntador->ptr[j - 1];
           }
-          cursor->key[i] = x;
-          cursor->size++;
-          cursor->ptr[i + 1] = child;
+          apuntador->key[i] = x;
+          apuntador->Tam++;
+          apuntador->ptr[i + 1] = hijo;
       } else {
           Nodo *newInternal = new Nodo;
-          int virtualKey[B + 1];
+          int TempKey[B + 1];
           Nodo *virtualPtr[B + 2];
           for (int i = 0; i < B; i++) {
-              virtualKey[i] = cursor->key[i];
+              TempKey[i] = apuntador->key[i];
           }
           for (int i = 0; i < B + 1; i++) {
-              virtualPtr[i] = cursor->ptr[i];
+              virtualPtr[i] = apuntador->ptr[i];
           }
           int i = 0, j;
-          while (x > virtualKey[i] && i < B)
+          while (x > TempKey[i] && i < B)
               i++;
           for (int j = B + 1; j > i; j--) {
-              virtualKey[j] = virtualKey[j - 1];
+              TempKey[j] = TempKey[j - 1];
           }
-          virtualKey[i] = x;
+          TempKey[i] = x;
           for (int j = B + 2; j > i + 1; j--) {
               virtualPtr[j] = virtualPtr[j - 1];
           }
-          virtualPtr[i + 1] = child;
+          virtualPtr[i + 1] = hijo;
           newInternal->hoja = false;
-          cursor->size = (B + 1) / 2;
-          newInternal->size = B - (B + 1) / 2;
-          for (i = 0, j = cursor->size + 1; i < newInternal->size; i++, j++) {
-              newInternal->key[i] = virtualKey[j];
+          apuntador->Tam = (B + 1) / 2;
+          newInternal->Tam = B - (B + 1) / 2;
+          for (i = 0, j = apuntador->Tam + 1; i < newInternal->Tam; i++, j++) {
+              newInternal->key[i] = TempKey[j];
           }
-          for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++) {
+          for (i = 0, j = apuntador->Tam + 1; i < newInternal->Tam + 1; i++, j++) {
               newInternal->ptr[i] = virtualPtr[j];
           }
-          if (cursor == root) {
+          if (apuntador == root) {
               Nodo *newRoot = new Nodo;
-              newRoot->key[0] = cursor->key[cursor->size];
-              newRoot->ptr[0] = cursor;
+              newRoot->key[0] = apuntador->key[apuntador->Tam];
+              newRoot->ptr[0] = apuntador;
               newRoot->ptr[1] = newInternal;
               newRoot->hoja = false;
-              newRoot->size = 1;
+              newRoot->Tam = 1;
               root = newRoot;
           } else {
-              insertInternal(cursor->key[cursor->size], findParent(root, cursor), newInternal);
+              Insertardentro(apuntador->key[apuntador->Tam], Encontrarpadre(root, apuntador), newInternal);
           }
       }
   }
 
-  Nodo *findParent(Nodo *cursor, Nodo *child) {
-      Nodo *parent;
-      if (cursor->hoja || (cursor->ptr[0])->hoja) {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  Nodo *Encontrarpadre(Nodo *apuntador, Nodo *hijo) {
+      Nodo *padre;
+      if (apuntador->hoja || (apuntador->ptr[0])->hoja) {
           return NULL;
       }
-      for (int i = 0; i < cursor->size + 1; i++) {
-          if (cursor->ptr[i] == child) {
-              parent = cursor;
-              return parent;
+      for (int i = 0; i < apuntador->Tam + 1; i++) {
+          if (apuntador->ptr[i] == hijo) {
+              padre = apuntador;
+              return padre;
           } else {
-              parent = findParent(cursor->ptr[i], child);
-              if (parent != NULL)
-                  return parent;
+              padre = Encontrarpadre(apuntador->ptr[i], hijo);
+              if (padre != NULL)
+                  return padre;
           }
       }
-      return parent;
+      return padre;
   }
-  void remove(const data_type& value) {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
  private:
 
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }  // namespace Concurrent
 }  // namespace EDA
