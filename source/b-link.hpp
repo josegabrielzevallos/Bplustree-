@@ -189,14 +189,14 @@ public:
           apuntador->Tam++;
           apuntador->ptr[i + 1] = hijo;
       } else {
-          Nodo *newInternal = new Nodo;
+          Nodo *nuevodentro = new Nodo;
           int TempKey[B + 1];
-          Nodo *virtualPtr[B + 2];
+          Nodo *TempPtr[B + 2];
           for (int i = 0; i < B; i++) {
               TempKey[i] = apuntador->key[i];
           }
           for (int i = 0; i < B + 1; i++) {
-              virtualPtr[i] = apuntador->ptr[i];
+              TempPtr[i] = apuntador->ptr[i];
           }
           int i = 0, j;
           while (value > TempKey[i] && i < B)
@@ -206,28 +206,28 @@ public:
           }
           TempKey[i] = value;
           for (int j = B + 2; j > i + 1; j--) {
-              virtualPtr[j] = virtualPtr[j - 1];
+              TempPtr[j] = TempPtr[j - 1];
           }
-          virtualPtr[i + 1] = hijo;
-          newInternal->hoja = false;
+          TempPtr[i + 1] = hijo;
+          nuevodentro->hoja = false;
           apuntador->Tam = (B + 1) / 2;
-          newInternal->Tam = B - (B + 1) / 2;
-          for (i = 0, j = apuntador->Tam + 1; i < newInternal->Tam; i++, j++) {
-              newInternal->key[i] = TempKey[j];
+          nuevodentro->Tam = B - (B + 1) / 2;
+          for (i = 0, j = apuntador->Tam + 1; i < nuevodentro->Tam; i++, j++) {
+              nuevodentro->key[i] = TempKey[j];
           }
-          for (i = 0, j = apuntador->Tam + 1; i < newInternal->Tam + 1; i++, j++) {
-              newInternal->ptr[i] = virtualPtr[j];
+          for (i = 0, j = apuntador->Tam + 1; i < nuevodentro->Tam + 1; i++, j++) {
+              nuevodentro->ptr[i] = TempPtr[j];
           }
           if (apuntador == root) {
               Nodo *newRoot = new Nodo;
               newRoot->key[0] = apuntador->key[apuntador->Tam];
               newRoot->ptr[0] = apuntador;
-              newRoot->ptr[1] = newInternal;
+              newRoot->ptr[1] = nuevodentro;
               newRoot->hoja = false;
               newRoot->Tam = 1;
               root = newRoot;
           } else {
-              Insertardentro(apuntador->key[apuntador->Tam], Encontrarpadre(root, apuntador), newInternal);
+              Insertardentro(apuntador->key[apuntador->Tam], Encontrarpadre(root, apuntador), nuevodentro);
           }
       }
   }
